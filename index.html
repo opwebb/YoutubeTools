@@ -600,13 +600,22 @@
                             <div class="thumbnail-info">
                                 <div class="thumbnail-title">${thumb.name} (${thumb.size})</div>
                                 <div class="btn-group">
-                                    <a href="${thumb.url}" class="download-btn" download="yt_${thumb.name.toLowerCase()}_${videoId}.jpg">Download</a>
+                                    <button class="download-btn" data-url="${thumb.url}" data-name="yt_${thumb.name.toLowerCase()}_${videoId}.jpg">Download</button>
                                     <button class="copy-btn" data-url="${thumb.url}">Copy URL</button>
                                 </div>
                             </div>
                         `;
                         
                         resultsElement.appendChild(item);
+                    });
+
+                    // Add download functionality
+                    document.querySelectorAll('.download-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const url = this.getAttribute('data-url');
+                            const filename = this.getAttribute('data-name');
+                            downloadImage(url, filename);
+                        });
                     });
                     
                     // Add copy functionality with fallback
@@ -688,6 +697,25 @@
                 errorElement.textContent = message;
                 errorElement.style.display = 'block';
                 loadingElement.style.display = 'none';
+            }
+
+            async function downloadImage(url, filename) {
+                try {
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    const blobUrl = window.URL.createObjectURL(blob);
+                    
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(blobUrl);
+                } catch (error) {
+                    console.error('Download failed:', error);
+                    alert('Failed to download image. Please try again.');
+                }
             }
         });
     </script>
