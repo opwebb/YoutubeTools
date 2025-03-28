@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTube Fetcher - Download Thumbnails in HD</title>
     <meta name="description" content="Free tool to download YouTube thumbnails in maximum resolution. No registration required.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    
     <style>
         :root {
             --primary: #ff0000;
@@ -41,16 +45,17 @@
         
         header {
             text-align: center;
-            margin: 15px 0 20px;
+            margin: 25px 0 20px;
             position: relative;
             flex-shrink: 0;
         }
         
         h1 {
             color: var(--primary);
-            font-size: clamp(1.5rem, 6vw, 2rem);
-            margin-bottom: 6px;
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            margin-bottom: 10px;
             line-height: 1.2;
+            font-weight: 700;
         }
         
         .tagline {
@@ -398,70 +403,50 @@
         <p class="tagline">Download thumbnails from any YouTube video</p>
         <button class="theme-toggle" aria-label="Toggle theme">🌓</button>
     </header>
-    
     <div class="input-container">
         <input type="text" id="youtube-url" placeholder="Paste YouTube URL here..." autofocus>
         <button id="submit-btn">Get Thumbnails</button>
     </div>
-    
     <div id="error"></div>
-    
     <div class="loading">
         <div class="loading-spinner"></div>
         <p>Loading...</p>
     </div>
-    
     <div id="results" class="thumbnails"></div>
-
     <!-- Legal Pages Content (hidden by default) -->
     <div id="privacy-policy" class="legal-content">
         <h2>Privacy Policy</h2>
         <p>Last updated: January 2023</p>
-        
         <h3>Information We Collect</h3>
         <p>We do not collect or store any personal information. All processing happens in your browser.</p>
-        
         <h3>Third-Party Services</h3>
         <p>We don't use any third-party tracking or analytics services.</p>
-        
         <h3>Changes to This Policy</h3>
         <p>We may update our Privacy Policy from time to time.</p>
-        
         <button class="back-btn">Back to YouTube Fetcher</button>
     </div>
-
     <div id="terms-of-service" class="legal-content">
         <h2>Terms of Service</h2>
         <p>Last updated: January 2023</p>
-        
         <h3>Use of Service</h3>
         <p>This service is provided free of charge for personal, non-commercial use.</p>
-        
         <h3>Prohibited Uses</h3>
         <p>You may not use this service to violate YouTube's Terms of Service.</p>
-        
         <h3>Disclaimer</h3>
         <p>This service is provided "as is" without warranties of any kind.</p>
-        
         <button class="back-btn">Back to YouTube Fetcher</button>
     </div>
-
     <div id="copyright-info" class="legal-content">
         <h2>Copyright Information</h2>
         <p>Last updated: January 2023</p>
-        
         <h3>Copyright Notice</h3>
         <p>All thumbnails are copyright of their respective owners.</p>
-        
         <h3>Fair Use</h3>
         <p>This tool is intended for fair use of YouTube's public thumbnail images.</p>
-        
         <h3>DMCA</h3>
         <p>If you believe any content infringes your copyright, please contact YouTube directly.</p>
-        
         <button class="back-btn">Back to YouTube Fetcher</button>
     </div>
-    
     <footer>
         <p>YouTube Fetcher &copy; <span id="year"></span> - Free online tool</p>
         <div class="footer-links">
@@ -470,12 +455,11 @@
             <a href="#" data-legal="copyright-info">Copyright Information</a>
         </div>
     </footer>
-    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Set current year
             document.getElementById('year').textContent = new Date().getFullYear();
-            
+
             const submitBtn = document.getElementById('submit-btn');
             const youtubeUrlInput = document.getElementById('youtube-url');
             const errorElement = document.getElementById('error');
@@ -486,11 +470,17 @@
             const legalContents = document.querySelectorAll('.legal-content');
             const backBtns = document.querySelectorAll('.back-btn');
 
-            // Theme toggle
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '🌞';
+            }
+
             themeToggle.addEventListener('click', function() {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
                 if (currentTheme === 'dark') {
-                    document.documentElement.removeAttribute('data-theme');
+                    document.documentElement.setAttribute('data-theme', 'light');
                     localStorage.setItem('theme', 'light');
                     themeToggle.textContent = '🌓';
                 } else {
@@ -499,13 +489,6 @@
                     themeToggle.textContent = '🌞';
                 }
             });
-
-            // Check for saved theme preference
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeToggle.textContent = '🌞';
-            }
 
             // Legal pages navigation
             legalLinks.forEach(link => {
@@ -516,7 +499,6 @@
                     document.querySelector('.loading').style.display = 'none';
                     resultsElement.style.display = 'none';
                     errorElement.style.display = 'none';
-                    
                     legalContents.forEach(content => {
                         content.style.display = content.id === target ? 'block' : 'none';
                     });
@@ -575,7 +557,6 @@
                     
                     // Check available thumbnails
                     const availableThumbs = [];
-                    
                     for (const thumb of thumbnails) {
                         const exists = await imageExists(thumb.url);
                         if (exists) {
@@ -605,7 +586,6 @@
                                 </div>
                             </div>
                         `;
-                        
                         resultsElement.appendChild(item);
                     });
 
@@ -634,7 +614,6 @@
                                     textArea.style.position = 'fixed';
                                     document.body.appendChild(textArea);
                                     textArea.select();
-                                    
                                     const successful = document.execCommand('copy');
                                     document.body.removeChild(textArea);
                                     
@@ -657,7 +636,7 @@
                     loadingElement.style.display = 'none';
                 }
             }
-
+            
             function showCopiedFeedback(button) {
                 button.textContent = 'Copied!';
                 button.classList.add('copied');
@@ -689,7 +668,6 @@
                     const match = url.match(pattern);
                     if (match?.[1]) return match[1];
                 }
-                
                 return null;
             }
             
@@ -698,13 +676,12 @@
                 errorElement.style.display = 'block';
                 loadingElement.style.display = 'none';
             }
-
+            
             async function downloadImage(url, filename) {
                 try {
                     const response = await fetch(url);
                     const blob = await response.blob();
                     const blobUrl = window.URL.createObjectURL(blob);
-                    
                     const link = document.createElement('a');
                     link.href = blobUrl;
                     link.download = filename;
